@@ -30,11 +30,11 @@ app.use(express.json());
 app.use(session({secret:"my_secret_key",resave:false,saveUninitialized:false}))
 app.use(passport.initialize());
 app.use(passport.session());
-app.use("/", UserRouter);
+app.use("/api", UserRouter);
 
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// passport.use(new LocalStrategy(User.authenticate()));
+// passport.serializeUser(User.serializeUser());
+// passport.deserializeUser(User.deserializeUser());
 
 
 // Error handling middleware

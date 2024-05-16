@@ -14,5 +14,19 @@ const UserSchema = new Schema({
         required: true,
     }
 });
-UserSchema.plugin(passportLocalMongoose)
+
+// Define a custom method to check if the provided password matches the hashed password stored in the database
+UserSchema.methods.isValidPassword = async function(password) {
+    try {
+        // Use the 'authenticate' method provided by passport-local-mongoose to validate the password
+        const isValid = await this.authenticate(password);
+        return isValid;
+    } catch (error) {
+        // Handle any potential errors
+        console.error('Error validating password:', error);
+        return false;
+    }
+};
+
+UserSchema.plugin(passportLocalMongoose);
 module.exports = mongoose.model("User", UserSchema);

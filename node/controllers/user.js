@@ -1,39 +1,58 @@
-
-const passport = require("passport");
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-module.exports.login = (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
-        if (err) {
-            return next(err);
+module.exports.login = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+
+        // Find user by email
+        const user = await User.findOne({ email });
+
+        // Check if user exists and password is correct
+        if (!user || !await user.isValidPassword(password)) {
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
-        if (!user) {
-            return res.status(401).json({ error: "Invalid username or password" });
-        }
-        req.login(user, (err) => {
-            if (err) {
-                return res.status(500).json({ error: "An error occurred" });
-            }
-            return res.status(200).json({ message: "Login Successful" })
-        });
-    })(req,res,next)
-}
-module.exports.logout = async (req, res) => {
-    req.logout();
-    res.status(200).json({message:"Log out successful"})
-}
+
+        // Generate JWT token
+        const token = jwt.sign({ userId: user._id, email: user.email }, 'your_secret_key', { expiresIn: '1h' });
+
+        // Return JWT token in response
+        res.status(200).json({ token });
+    } catch (error) {
+        // Handle errors
+        console.error('Error logging in:', error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+};
+
 module.exports.register = async (req, res, next) => {
     try {
         const { email, username, password } = req.body;
 
-        const exitstingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (exitstingUser) {
-            return res.status(400).json({ error: 'Username or email already exists' });
+        // Check if user with email exists
+        if (await User.findOne({ email })) {
+            return res.status(400).json({ error: 'Email already exists' });
         }
-        const newuser = new User({ email, username });
-        await User.register(newuser, password);
-        return res.status(201).json({ message: "User registered successfully" });
+
+        // Create new user
+        const newUser = new User({ email, username });
+        await newUser.setPassword(password);
+        await newUser.save();
+
+        res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        return res.status(500).json({ error: "An error occurred",message:error.message});
+        console.error('Error registering user:', error);
+        res.status(500).json({ error: 'An error occurred' });
     }
-}
+};
+
+module.exports.get = async (req, res, next) => {
+    try {
+        // Retrieve all users from the database
+        const users = await User.find();
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+};
