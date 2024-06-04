@@ -2,24 +2,37 @@ const express = require("express")
 const cors = require("cors");
 const mongoose = require("mongoose")
 const db = require("./db/db-conection");
+
+require('dotenv').config();
 db.connectDb();
 
 const corsOptions = {
-  origin: 'http://localhost:8085',
-  optionsSuccessStatus:200,
+  origin: ['http://localhost:8085','http://localhost:5173'],
+  optionsSuccessStatus: 200,
+  credentials:true
 }
 
 const passport = require("passport")
 const session = require("express-session")
 const UserRouter = require("./routes/user")
-const PostRouter = require("./routes/post");
+const PostRouter = require("./routes/post")
 const User = require("./models/user")
 
+console.log("app started in " + process.env.NODE_ENV);
+
+const http = require('http')
 const app = express();
+const server = http.createServer(app);
+const mountIoListener = require('./controllers/Chat')
+
+const io = mountIoListener(server)
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(cors(corsOptions))
-app.use(session({secret:"my_secret_key",resave:false,saveUninitialized:false}))
+app.use(session({ secret: "my_secret_key", resave: false, saveUninitialized: false }))
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/", UserRouter);
@@ -46,13 +59,6 @@ passport.use(new JwtStrategy(jwtOptions, function (jwtPayload, done) {
   
 }));
 
-app.use("/protected", passport.authenticate("jwt", { session: false }), (req,res) => {
-  res.json({
-    success: true,
-    message:"this is the the jwt middleware"
-  });
-});
-
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -66,6 +72,6 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

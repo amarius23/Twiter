@@ -19,12 +19,9 @@ const authenticateToken = (req, res, next) => {
 module.exports.createPost = async (req, res) => {
     try {
         console.log(req.body);
-        const { title, content } = req.body;
+        const {content } = req.body;
 
         // Validate the presence of all required fields
-        if (!title) {
-            return res.status(400).json({ success: false, message: 'Title is required' });
-        }
         if (!content) {
             return res.status(400).json({ success: false, message: 'Content is required' });
         }
@@ -33,13 +30,12 @@ module.exports.createPost = async (req, res) => {
         }
 
         const newPost = new Post({
-            title,
             content,
             userId: req.user.id
         });
 
         await newPost.save();
-        res.status(201).json({ success: true, message: 'Post created successfully', post: newPost });
+        res.status(200).json({ success: true, message: 'Post created successfully', post: newPost });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'An error occurred while creating the post' });

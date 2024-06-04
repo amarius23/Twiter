@@ -8,9 +8,10 @@ const mongoDatabase = process.env.DATABASE_NAME;
 const connectionString = `mongodb://${mongoUser}:${mongoPassword}@${mongoHost}`;
 
 module.exports.connectDb = () => {
-    mongoose.connect(connectionString).then(() => {
-        console.log('Connected to MongoDB');
-    }).catch((error) => {
-        console.error('Error connecting to MongoDB:', error);
-    });
-};
+    mongoose.connect(connectionString, {
+    dbName:mongoDatabase
+  }).then(() => {
+  }).catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+  });
+}

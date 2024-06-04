@@ -1,9 +1,6 @@
-const passport = require("passport");
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const jwt = require("jsonwebtoken");
 const argon2 = require('argon2');
-require('dotenv').config();
-
 
 const generateToken = (user) => {
     const payload = {
@@ -14,9 +11,17 @@ const generateToken = (user) => {
     return token;
 }
 
+module.exports.loadAll = async () => {
+    try {
+        const users = await User.find({});
+        return users;
+    } catch (e) {
+        console.log(e);
+    }
+}
 module.exports.login = async (req, res, next) => {
     try {
-        const user = await User.findOne({ username: req.body.username });
+        const user = await User.findOne({ username: req.body.username }).select('+password');
         if (!user) {
             return res.json({
                 success: false,
@@ -39,10 +44,11 @@ module.exports.login = async (req, res, next) => {
             data: {
                 success: true,
                 user: {
+                    id: user.id,
                     username: user.username,
                     email: user.email
                 },
-                token: "bearer " + token
+                token: token
             }
         });
     } catch (error) {
@@ -53,7 +59,6 @@ module.exports.login = async (req, res, next) => {
         });
     }
 };
-
 module.exports.logout = async (req, res) => {
     req.logout();
     res.status(200).json({message:"Log out successful"})
@@ -73,14 +78,25 @@ module.exports.register = async (req, res, next) => {
         const newUser = new User({ email, username, password: hash });
     
         await newUser.save()
-          .then(() => {
-            return res.status(201).json({ message: "User registered successfully" });
+            .then(() => {
+            const token = generateToken(newUser);
+                return res.status(201).json({
+                    success:true,
+                    message: "User registered successfully",
+                    user: {
+                        id:newUser.id,
+                        username: newUser.username,
+                        email: newUser.email
+                    },
+                    token: "bearer " + token
+                });
           })
-          .catch(error => {
-            return res.status(500).json({ error: "An error occurred", message: error.message });
+            .catch(error => {
+              console.log(error)
+            return res.status(500).json({ error: "An error occurred here", message: error.message });
           });
       } catch (error) {
         console.log(error);
-        return res.status(500).json({ error: "An error occurred", message: error.message });
+        return res.status(500).json({ error: "An error occurred catch", message: error.message });
       }
     }

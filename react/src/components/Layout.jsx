@@ -1,25 +1,31 @@
+import { Button } from "bootstrap";
 import { Outlet, Link } from "react-router-dom";
-
-const Layout = (props) => {
+import { useAuth } from "./AuthContext";
+const Layout = () => {
+  const { updateAuth } = useAuth();
   return (
     <>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <a className="navbar-brand" href="#">Navbar</a>
+        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span className="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item active">
+        <div className="collapse navbar-collapse px-3 justify-content-between" id="navbarNav">
+          <ul className="navbar-nav">
+            <li className="nav-item active">
             <Link className="nav-link" to="/">Home</Link>
             </li>
-            <li class="nav-item">
+            <li className="nav-item">
               <Link className="nav-link" to="/login">Login</Link>
             </li>
-            <li class="nav-item">
+            <li className="nav-item">
             <Link className="nav-link" to="/register">Register</Link>
             </li>
+            <li className="nav-item">
+            <Link className="nav-link" to="/chat">Chat</Link>
+            </li>
           </ul>
+          <button className="btn btn-danger" onClick={()=>{updateAuth(null,null,null)}}>Log Out</button>
         </div>
       </nav>
       <Outlet />

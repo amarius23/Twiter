@@ -1,12 +1,12 @@
 import React from "react";
 import { useState } from "react";
-import PropTypes from 'prop-types';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const LoginForm = (props) => {
+
+const LoginForm = ({updateAuth}) => {
     const [username, setUsername]  = useState('');
     const [password, setPassword] = useState('');
-    const {updateUser,updateToken} = props;
+
     const navigate = useNavigate();
 
     const submit = (e) => {
@@ -18,17 +18,14 @@ const LoginForm = (props) => {
             }
         ).then(response => {
             if (response.data.data.success === true) {
-                const user =  response.data.data.user;
-                const token = response.data.data.token;
-
-                updateUser(user);
-                updateToken(token);
-                useNavigate
+                console.log(response.data.data.token)
+               
+                updateAuth(response.data.data.token,
+                    response.data.data.user.username,
+                    response.data.data.user.id)
+                console.log(response.data.data.user.id);
+                navigate('/');
                 
-                 // Store user and token in localStorage
-                 localStorage.setItem('user', JSON.stringify(user));
-                 localStorage.setItem('token', token);
-                navigate('/')
             }
             else {
                 console.log(response.data.message);
@@ -36,7 +33,7 @@ const LoginForm = (props) => {
             
             
         }).catch (error => {
-            console.log(error);  
+            console.log(error.message);  
          })
     }
     return <div>
@@ -54,8 +51,8 @@ const LoginForm = (props) => {
             </form>
         </div>
 }
-LoginForm.propTypes = {
-    updateToken: PropTypes.func.isRequired,
-    updateUser: PropTypes.func.isRequired,
-}
+// LoginForm.propTypes = {
+//     updateToken: PropTypes.func.isRequired,
+//     updateUser: PropTypes.func.isRequired,
+// }
 export default LoginForm;

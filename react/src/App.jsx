@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route ,Navigate} from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from "react";
 import Layout from "./components/Layout";
@@ -8,6 +8,8 @@ import PostUser from "./components/PostUser";
 import GetAllUser from "./components/GetAllUser";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Chat from "./pages/Chat";
+import { AuthProvider,useAuth } from "./components/AuthContext"; 
 import Profile from "./components/Profile";
 
 export default function App() {
@@ -24,18 +26,24 @@ export default function App() {
   }, []);
 
   return (
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-          <Route index element={<Home user={user} />} />
+          <Route index element={<Home/>} />
           <Route path="post" element={<PostUser />} />
+            <Route path="get" element={<GetAllUser />} />
+            <Route path="/login" element={<Login  />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/chat" element={<Chat />} />
           <Route path="get" element={<GetAllUser />} />
           <Route path="/profile" element={<Profile user={user} setUser={setUser} jwtToken={jwtToken} setJwtToken={setJwtToken} />} />
           <Route path="/login" element={<Login updateUser={setUser} updateToken={setJwtToken}  />} />
           <Route path="/register" element={<Register/>} />
           </Route>
         </Routes>
-        </BrowserRouter>
+      </BrowserRouter>
+      </AuthProvider>  
   );
 }
 const root = ReactDOM.createRoot(document.getElementById('root'));
