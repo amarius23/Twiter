@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const jwt = require("jsonwebtoken");
 const argon2 = require('argon2');
 
 const generateToken = (user) => {
@@ -49,7 +48,7 @@ module.exports.login = async (req, res, next) => {
                     username: user.username,
                     email: user.email
                 },
-                token: "bearer " + token
+                token: token
             }
         });
     } catch (error) {
