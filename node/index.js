@@ -1,40 +1,63 @@
 const express = require("express")
+const cors = require("cors");
 const mongoose = require("mongoose")
+const db = require("./db/db-conection");
+
+require('dotenv').config();
+db.connectDb();
+
+const corsOptions = {
+  origin: ['http://localhost:5173','http://localhost:8085'],
+  optionsSuccessStatus: 200,
+  credentials:true
+}
+
 const passport = require("passport")
-const LocalStrategy = require("passport-local").Strategy
 const session = require("express-session")
 const UserRouter = require("./routes/user")
+const PostRouter = require("./routes/post")
 const User = require("./models/user")
 
-const mongoUser = process.env.DATABASE_USER;
-const mongoPassword = process.env.DATABASE_PASSWORD;
-const mongoHost = process.env.DATABASE_HOST;
-const mongoDatabase = process.env.DATABASE_NAME;
+console.log("app started in " + process.env.NODE_ENV);
 
-const connectionString = `mongodb://${mongoUser}:${mongoPassword}@${mongoHost}`;
-
-mongoose.connect(connectionString, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  dbName:mongoDatabase
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch((error) => {
-  console.error('Error connecting to MongoDB:', error);
-});
-
-//
-
+const http = require('http')
 const app = express();
+const server = http.createServer(app);
+const mountIoListener = require('./controllers/Chat')
+
+const io = mountIoListener(server)
+
 app.use(express.json());
-app.use(session({secret:"my_secret_key",resave:false,saveUninitialized:false}))
+app.use(express.urlencoded({ extended: true }))
+app.use(cors(corsOptions))
+app.use(session({ secret: "my_secret_key", resave: false, saveUninitialized: false }))
+
+
 app.use(passport.initialize());
 app.use(passport.session());
-app.use("/api", UserRouter);
+app.use("/", UserRouter);
+app.use("/api/posts", PostRouter);
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-// passport.use(new LocalStrategy(User.authenticate()));
-// passport.serializeUser(User.serializeUser());
-// passport.deserializeUser(User.deserializeUser());
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: 'my_secret_key_123',
+};
+ 
+passport.use(new JwtStrategy(jwtOptions, function (jwtPayload, done) {
+  console.log(jwtPayload)
+  User.findById(jwtPayload.id).then(user => { 
+    if (user) {
+      return done(null, user);
+    } else {
+      return done(null, false);
+    }
+  }).catch(err => { 
+    return done(err, false);
+  })
+  
+}));
 
 
 // Error handling middleware
@@ -49,6 +72,6 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
