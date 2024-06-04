@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CreatePost from './CreatePost';
+import PostList from './PostList';
 import './Profile.css';
+
 
 const Profile = ({ user }) => {
   const [posts, setPosts] = useState([]);
@@ -29,11 +31,7 @@ const Profile = ({ user }) => {
       </div>
       <div className="profile-content">
         <CreatePost onPost={handleNewPost} />
-        {posts.map((post, index) => (
-          <div key={index} className="post">
-            {post}
-          </div>
-        ))}
+        <PostList/>
       </div>
     </div>
   );

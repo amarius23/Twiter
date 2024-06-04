@@ -1,0 +1,26 @@
+.post-card {
+    border: 1px solid #e1e8ed;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+  }
+  
+  .post-card-content {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .post-card-delete-button {
+    background-color: #e0245e;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .post-card-delete-button:hover {
+    background-color: #c21e56;
+  }
+  

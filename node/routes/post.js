@@ -5,7 +5,7 @@ const { authenticateToken } = require('../controllers/post');
 
 router.post('/create', authenticateToken, postController.createPost);
 router.put('/posts/:postId', authenticateToken, postController.updatePost);
-router.delete('/posts/:postId', authenticateToken, postController.deletePost);
+router.delete('/delete/:postId', authenticateToken, postController.deletePost);
 router.get('/user', authenticateToken, postController.getUserPosts);
 
 module.exports = router;

@@ -79,11 +79,11 @@ module.exports.deletePost = async (req, res) => {
             return res.status(403).json({ success: false, message: 'You do not have permission to delete this post' });
         }
 
-        await post.remove();
+        await await Post.deleteOne({ _id: postId });
         res.status(200).json({ success: true, message: 'Post deleted successfully' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'An error occurred while deleting the post' });
+        res.status(500).json({ success: false, message: 'An error occurred while deleting the post',error: error.message});
     }
 };
 
