@@ -1,5 +1,4 @@
-
-const passport = require("passport");
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const jwt = require("jsonwebtoken");
 const argon2 = require('argon2');

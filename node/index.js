@@ -15,6 +15,7 @@ const corsOptions = {
 const passport = require("passport")
 const session = require("express-session")
 const UserRouter = require("./routes/user")
+const PostRouter = require("./routes/post")
 const User = require("./models/user")
 
 console.log("app started in " + process.env.NODE_ENV);
@@ -35,6 +36,7 @@ app.use(session({ secret: "my_secret_key", resave: false, saveUninitialized: fal
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/", UserRouter);
+app.use("/api/posts", PostRouter);
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
@@ -56,15 +58,6 @@ passport.use(new JwtStrategy(jwtOptions, function (jwtPayload, done) {
   })
   
 }));
-
-
-app.use("/protected", passport.authenticate("jwt", { session: false }), (req,res) => {
-  res.json({
-    success: true,
-    message:"this is the the jwt middleware"
-  });
-});
-
 
 
 // Error handling middleware
