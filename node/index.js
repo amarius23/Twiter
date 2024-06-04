@@ -5,13 +5,14 @@ const db = require("./db/db-conection");
 db.connectDb();
 
 const corsOptions = {
-  origin: 'http://localhost:5175',
+  origin: 'http://localhost:8085',
   optionsSuccessStatus:200,
 }
 
 const passport = require("passport")
 const session = require("express-session")
 const UserRouter = require("./routes/user")
+const PostRouter = require("./routes/post");
 const User = require("./models/user")
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(session({secret:"my_secret_key",resave:false,saveUninitialized:false}))
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/", UserRouter);
+app.use("/api/posts", PostRouter);
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 

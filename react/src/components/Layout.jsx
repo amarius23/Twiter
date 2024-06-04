@@ -1,6 +1,6 @@
 import { Outlet, Link } from "react-router-dom";
 
-const Layout = () => {
+const Layout = (props) => {
   return (
     <>
       <nav class="navbar navbar-expand-lg navbar-light bg-light">

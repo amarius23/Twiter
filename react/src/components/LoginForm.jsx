@@ -17,12 +17,17 @@ const LoginForm = (props) => {
                 password:password
             }
         ).then(response => {
-            console.log(response.data);
-            if (response.data.success === true) { 
-                updateUser(response.data.data.user);
-                updateToken(response.data.data.token);
+            if (response.data.data.success === true) {
+                const user =  response.data.data.user;
+                const token = response.data.data.token;
+
+                updateUser(user);
+                updateToken(token);
                 useNavigate
-                console.log(response.data.message);
+                
+                 // Store user and token in localStorage
+                 localStorage.setItem('user', JSON.stringify(user));
+                 localStorage.setItem('token', token);
                 navigate('/')
             }
             else {
