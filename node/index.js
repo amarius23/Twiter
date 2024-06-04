@@ -1,65 +1,84 @@
-import pg from 'pg';
-import express from 'express';
-import bodyParser from 'body-parser';
+const express = require("express")
+const cors = require("cors");
+const mongoose = require("mongoose")
+const db = require("./db/db-conection");
 
+require('dotenv').config();
+db.connectDb();
 
-const { Client } = pg;
+const corsOptions = {
+  origin: ['http://localhost:5173','http://localhost:8085'],
+  optionsSuccessStatus: 200,
+  credentials:true
+}
 
-const client = new Client({
-  user: 'postgres',
-  host: 'db',
-  database: 'postgres',
-  password: '1234',
-  port: 5432,
-});
-client.connect().then(() => console.log('Connected to PostgreSQL'))
-.catch(err => console.error('Error connecting to PostgreSQL', err));;
+const passport = require("passport")
+const session = require("express-session")
+const UserRouter = require("./routes/user")
+const User = require("./models/user")
 
-const createTable = async () => { 
-    await client.query(`CREATE TABLE IF NOT EXISTS users 
-    (id serial PRIMARY KEY, name VARCHAR (255) UNIQUE NOT NULL, 
-    email VARCHAR (255) UNIQUE NOT NULL, age INT NOT NULL);`)
-  };
-  
-  createTable();
+console.log("app started in " + process.env.NODE_ENV);
 
-  const app = express();
+const http = require('http')
+const app = express();
+const server = http.createServer(app);
+const mountIoListener = require('./controllers/Chat')
+
+const io = mountIoListener(server)
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }))
+app.use(cors(corsOptions))
+app.use(session({ secret: "my_secret_key", resave: false, saveUninitialized: false }))
 
-app.get('/api', (req, res) => res.send('Hello World!'));
 
-app.get('/api/all', async (req, res) => {
-    try {
-      const response = await client.query(`SELECT * FROM users`);
-      
-      if(response){
-        res.status(200).send(response.rows);
-      }
-      
-    } catch (error) {
-      res.status(500).send('Error');
-      console.log(error);
-    } 
-  });
+app.use(passport.initialize());
+app.use(passport.session());
+app.use("/", UserRouter);
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-  app.post('/api/form', async (req, res) => {
-    try {
-        const { name, email, age } = req.body;
-
-        const queryText = 'INSERT INTO users(name, email, age) VALUES ($1, $2, $3)';
-        const values = [name, email, age];
-
-        const response = await client.query(queryText, values);
-        if (response) {
-            res.status(200).send(req.body);
-        }
-    } catch (error) {
-        console.error(error); // Log the error to the console for debugging
-
-        // Send a more informative error message in the response
-        res.status(500).json({ error: 'Internal server error', message: error.message });
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: 'my_secret_key_123',
+};
+ 
+passport.use(new JwtStrategy(jwtOptions, function (jwtPayload, done) {
+  console.log(jwtPayload)
+  User.findById(jwtPayload.id).then(user => { 
+    if (user) {
+      return done(null, user);
+    } else {
+      return done(null, false);
     }
+  }).catch(err => { 
+    return done(err, false);
+  })
+  
+}));
+
+
+app.use("/protected", passport.authenticate("jwt", { session: false }), (req,res) => {
+  res.json({
+    success: true,
+    message:"this is the the jwt middleware"
+  });
 });
 
-  app.listen(3000, () => console.log(`App running on port 3000.`));
+
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Catch-all middleware for unmatched routes
+app.use((req, res) => {
+  res.status(404).send('Not Found');
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

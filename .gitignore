@@ -1,1 +1,5 @@
 data/
+node/.env
+mongo-data
+docker-compose.yaml
+react/mode_modules
