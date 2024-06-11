@@ -27,7 +27,6 @@ const PostList = () => {
             ...post
         }));
         setPosts(fetchedPosts);
-        console.log('Post fetched successfully:', fetchedPosts);
       } else {
         console.error('Error retrieving posts');
       }

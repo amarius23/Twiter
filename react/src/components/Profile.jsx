@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import CreatePost from './CreatePost';
 import PostList from './PostList';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+//import { faUser } from '@fortawesome/free-solid-svg-icons';
 import './Profile.css';
 
 
@@ -10,13 +12,13 @@ const Profile = ({ user }) => {
   const handleNewPost = (postContent) => {
     setPosts([postContent, ...posts]);
   };
-
+  console.log(user);
   return (
     <div className="profile">
       <div className="profile-header">
         <div className="profile-banner"></div>
         <div className="profile-picture-container">
-          <img className="profile-picture" src="https://via.placeholder.com/150" alt="Profile" />
+
         </div>
       </div>
       <div className="profile-details">
