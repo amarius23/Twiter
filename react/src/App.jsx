@@ -23,6 +23,7 @@ export default function App() {
       setUser(JSON.parse(storedUser));
       setJwtToken(storedToken);
     }
+
   }, []);
 
   return (
