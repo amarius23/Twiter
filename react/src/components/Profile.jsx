@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import CreatePost from './CreatePost';
 import PostList from './PostList';
+import EditProfile from './EditProfile';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCamera } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faCamera, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Profile.css';
@@ -92,11 +93,13 @@ useEffect(() => {
           />
           <FontAwesomeIcon icon={faCamera} className="camera-icon" />
         </div>
-        <button id="editProfileButton" class="edit-profile-button">Edit Profile</button>
+        <EditProfile user={user} token = {token} />
       </div>
       <div className="text-center profile-details">
         <h2 className="profile-name">{user.username}</h2>
         <p className="profile-email">{user.email}</p>
+        {user.bio && <p className="profile-bio">{user.bio}</p>}
+        {user.location && <p className="profile-location"><FontAwesomeIcon icon={faMapMarkerAlt} /> {user.location}</p>}
       </div>
       <div className="d-flex justify-content-around border-top border-bottom py-2 profile-tabs">
         <button className="btn btn-link tab-button">Tweets</button>

@@ -184,3 +184,20 @@ form button {
 form button:hover {
   background-color: #218838;
 }
+
+.profile-bio {
+  font-style: italic;
+  margin-top: 10px;
+}
+
+.profile-location {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  color: #888;
+}
+
+.profile-location .fa-map-marker-alt {
+  margin-right: 5px;
+}
