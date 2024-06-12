@@ -16,6 +16,7 @@ const passport = require("passport")
 const session = require("express-session")
 const UserRouter = require("./routes/user")
 const PostRouter = require("./routes/post")
+const ProfileRouter = require("./routes/profile");
 const User = require("./models/user")
 
 console.log("app started in " + process.env.NODE_ENV);
@@ -37,6 +38,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use("/", UserRouter);
 app.use("/api/posts", PostRouter);
+app.use("/api/profile",ProfileRouter)
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
