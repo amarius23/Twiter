@@ -31,7 +31,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Layout user={user}/>}>
           <Route index element={<Home/>} />
           <Route path="post" element={<PostUser />} />
             <Route path="get" element={<GetAllUser />} />
