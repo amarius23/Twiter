@@ -21,6 +21,14 @@ const UserSchema = new Schema({
     },
     profilePicture: {
         type: String,
+    },
+    bio: {
+        type: String,
+        maxlength: 500
+    },
+    location: {
+        type: String,
+        maxlength: 100
     }
 });
 

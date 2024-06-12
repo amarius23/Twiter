@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const multer = require('multer');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+const { check, validationResult } = require('express-validator');
 const fs = require('fs');
 
 // Set up storage engine using multer
@@ -89,7 +91,37 @@ const getProfilePicture = async (req, res) => {
   }
 };
 
+
+const updateProfile = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const { username, bio, location } = req.body;
+
+    if (username) user.username = username;
+    if (bio) user.bio = bio;
+    if (location) user.location = location;
+
+    await user.save();
+
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+
 module.exports = {
     uploadProfilePicture,
-    getProfilePicture
+    getProfilePicture,
+    updateProfile
 };
