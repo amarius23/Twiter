@@ -22,8 +22,7 @@ const PostList = () => {
       if (response.status === 200) {
         // Assuming the response.data.posts contains an array of posts
         const fetchedPosts = response.data.posts.map(post => ({
-            _id: post._id, // Override the ID here
-            // Keep other properties the same
+            _id: post._id, 
             ...post
         }));
         setPosts(fetchedPosts);
