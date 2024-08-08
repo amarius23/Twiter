@@ -20,7 +20,6 @@ export default function EditProfile({ user, token }) {
     setUserName(user.username);
     setBio(user.bio);
     setLocation(user.location);
-    console.log(location);
   }, [user]);
 
   const handleSave = async () => {

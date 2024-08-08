@@ -1,7 +1,7 @@
 import { Button } from "bootstrap";
 import { Outlet, Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-const Layout = () => {
+const Layout = (user) => {
   const { updateAuth } = useAuth();
   return (
     <>
@@ -24,6 +24,13 @@ const Layout = () => {
             <li className="nav-item">
             <Link className="nav-link" to="/chat">Chat</Link>
             </li>
+            {user && ( // Conditionally render Profile tab if user is authenticated
+            <li className="nav-item">
+              <Link className="nav-link" to="/profile">
+                Profile
+              </Link>
+            </li>
+          )}
           </ul>
           <button className="btn btn-danger" onClick={()=>{updateAuth(null,null,null)}}>Log Out</button>
         </div>

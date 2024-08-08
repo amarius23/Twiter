@@ -1,5 +1,7 @@
+const mongoose = require('mongoose');
 const Post = require('../models/post');
 const jwt = require('jsonwebtoken');
+const Like = require('../models/Likes');
 require('dotenv').config();
 
 module.exports.createPost = async (req, res) => {
@@ -79,8 +81,36 @@ module.exports.getUserPosts = async (req, res) => {
     const userId = req.user.id;
 
     // Query the database for posts created by the user
-    const userPosts = await Post.find({ userId });
-
+    const userPosts = await Post.aggregate([
+        { $match: { userId: mongoose.Types.ObjectId.createFromHexString(userId) } },
+        {
+          $lookup: {
+            from: 'likes', // collection name in the database
+            localField: '_id',
+            foreignField: 'postId',
+            as: 'likes'
+          }
+        },
+        {
+          $lookup: {
+            from: 'comments', // collection name in the database
+            localField: 'comments',
+            foreignField: '_id',
+            as: 'comments'
+          }
+        },
+        {
+          $addFields: {
+            likeCount: { $size: '$likes' }
+          }
+        },
+        {
+          $project: {
+            likes: 0 // Optional: Exclude the likes array from the output
+          }
+        }
+      ]);
+    
     res.status(200).json({
       success: true,
       message: 'User posts retrieved successfully',
