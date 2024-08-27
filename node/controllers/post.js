@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const Post = require('../models/post');
+const Comment = require('../models/Comment');
 const jwt = require('jsonwebtoken');
 const Like = require('../models/Likes');
 require('dotenv').config();
 
 module.exports.createPost = async (req, res) => {
     try {
-        console.log(req.body);
         const {content } = req.body;
 
         // Validate the presence of all required fields
@@ -85,12 +85,16 @@ module.exports.getUserPosts = async (req, res) => {
         { $match: { userId: mongoose.Types.ObjectId.createFromHexString(userId) } },
         {
           $lookup: {
-            from: 'likes', // collection name in the database
-            localField: '_id',
-            foreignField: 'postId',
-            as: 'likes'
+            from: 'users', // Ensure this matches the actual collection name
+            let: { userId: '$userId' },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
+              { $project: { username: 1, email: 1 } }  // Specify fields to include
+            ],
+            as: 'user'
           }
         },
+        { $unwind: '$user' },
         {
           $lookup: {
             from: 'comments', // collection name in the database
@@ -100,8 +104,16 @@ module.exports.getUserPosts = async (req, res) => {
           }
         },
         {
+          $lookup: {
+            from: 'comments',
+            localField: 'comments',
+            foreignField: '_id',
+            as: 'commentDetails'
+          }
+        },
+        {
           $addFields: {
-            likeCount: { $size: '$likes' }
+            likeCount: { $size: { $ifNull: ['$likes', []] } }
           }
         },
         {
@@ -121,6 +133,32 @@ module.exports.getUserPosts = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'An error occurred while retrieving user posts',
+    });
+  }
+};
+
+
+module.exports.postComment = async (req, res) => {
+  try {
+    console.log(req.user);
+    
+    const newComment = new Comment({
+      userId: req.user.id,
+      postId: req.body.postId,
+      content: req.body.comment,
+      createdAt: Date.now(),
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Comment posted successfully',
+      comment: newComment
+    });
+  } catch (error) {
+    console.error('Error posting comment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while posting the comment',
     });
   }
 };

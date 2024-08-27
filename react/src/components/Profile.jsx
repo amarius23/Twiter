@@ -1,21 +1,52 @@
 import React, { useState, useEffect } from 'react';
+import { PostContext } from '../contexts/PostContext';
 import CreatePost from './CreatePost';
 import PostList from './PostList';
 import EditProfile from './EditProfile';
+import { useAuth } from './AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCamera, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Profile.css';
 
-const token = localStorage.getItem('token');
-
-const Profile = ({ user }) => {
+const Profile = () => {
+  const {user,token} = useAuth();
+  console.log(user);
+  
   const [posts, setPosts] = useState([]);
   const [profilePicture, setProfilePicture] = useState(user.profilePicture || null);
 
   const handleNewPost = (postContent) => {
     setPosts([postContent, ...posts]);
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+
+      const response = await axios.get('http://localhost:3000/api/posts/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.status === 200) {
+        // Assuming the response.data.posts contains an array of posts
+        const fetchedPosts = response.data.posts.map(post => ({
+            _id: post._id, 
+            ...post
+        }));
+        setPosts(fetchedPosts);
+      } else {
+        console.error('Error retrieving posts');
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
   };
 
 useEffect(() => {
@@ -109,7 +140,9 @@ useEffect(() => {
       </div>
       <div className="profile-content mt-4">
         <CreatePost onPost={handleNewPost} />
-        <PostList posts={posts} />
+        <PostContext.Provider value = {posts}>
+          <PostList />
+        </PostContext.Provider>
       </div>
     </div>
   );

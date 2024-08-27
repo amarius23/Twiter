@@ -26,7 +26,7 @@ const LoginForm = ({updateAuth}) => {
                 
             }
             else {
-                console.log(response.data.message);
+                
             }
             
             

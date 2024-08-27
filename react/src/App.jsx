@@ -39,7 +39,7 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/chat" element={<Chat />} />
           <Route path="get" element={<GetAllUser />} />
-          <Route path="/profile" element={<Profile user={user} setUser={setUser} jwtToken={jwtToken} setJwtToken={setJwtToken} />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login updateUser={setUser} updateToken={setJwtToken}  />} />
           <Route path="/register" element={<Register/>} />
           </Route>
