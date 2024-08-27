@@ -2,9 +2,9 @@ import React from "react";
 import { useAuth } from "./AuthContext";
 import { Link } from "react-router-dom";
 const Home = () => {
-  const { username,id,token } = useAuth();
-  const greeting = (username != '') ?
-    `Hello there,${username} your user id is :${id} and the token is ${token}`
+  const { user,id,token } = useAuth();
+  const greeting = (user != '') ?
+    `Hello there,${user.username} your user id is :${id} and the token is ${token}`
     :
     <div className="container">
       <div>
