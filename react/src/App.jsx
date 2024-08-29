@@ -6,12 +6,11 @@ import { useState, useEffect } from "react";
 import Layout from "./components/Layout";
 import Home from "./components/Home";
 import PostUser from "./components/PostUser";
-import GetAllUser from "./components/GetAllUser";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Chat from "./pages/Chat";
 import { AuthProvider,useAuth } from "./components/AuthContext"; 
-import Profile from "./components/Profile";
+import Profile from "./pages/Profile/Profile";
 
 export default function App() {
   const [user, setUser] = useState({});
@@ -21,7 +20,7 @@ export default function App() {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
     if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
+      setUser(storedUser);
       setJwtToken(storedToken);
     }
 
@@ -34,11 +33,9 @@ export default function App() {
           <Route path="/" element={<Layout user={user}/>}>
           <Route index element={<Home/>} />
           <Route path="post" element={<PostUser />} />
-            <Route path="get" element={<GetAllUser />} />
             <Route path="/login" element={<Login  />} />
             <Route path="/register" element={<Register />} />
             <Route path="/chat" element={<Chat />} />
-          <Route path="get" element={<GetAllUser />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login updateUser={setUser} updateToken={setJwtToken}  />} />
           <Route path="/register" element={<Register/>} />

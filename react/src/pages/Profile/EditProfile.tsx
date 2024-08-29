@@ -6,8 +6,10 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../components/AuthContext';
 
-export default function EditProfile({ user, token }) {
+export default function EditProfile() {
+  const {user,token} = useAuth();
   const [open, setOpen] = React.useState(false);
   const [userName, setUserName] = useState(user.username);
   const [bio, setBio] = useState(user.bio || '');
@@ -57,7 +59,6 @@ export default function EditProfile({ user, token }) {
     borderRadius: '8px',
     p: 4,
     textAlign: 'center',
-    position: 'relative',
   };
 
   const closeButtonStyle = {

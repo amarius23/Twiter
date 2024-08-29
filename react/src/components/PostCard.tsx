@@ -13,9 +13,14 @@ import Button from '@mui/material/Button';
 import axios from 'axios';
 import * as GLOBAL from '../constants';
 import { useAuth } from './AuthContext';
+import {Post} from '../types/Post';
 
+interface PostCardProps {
+  post: Post;
+}
 
-const PostCard = ({ post, onDelete }) => {
+const PostCard: React.FC<PostCardProps> = (post) => {
+  
   const {user, id, token} = useAuth();
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState('');
@@ -24,9 +29,9 @@ const PostCard = ({ post, onDelete }) => {
 
   
   const postComment = async() => {
-    const response = await axios.post(GLOBAL.API_URL+'/posts/'+post._id+'/comment',  
+    const response = await axios.post(GLOBAL.API_URL+'/posts/'+post.post._id+'/comment',  
       {
-        postId: post._id,
+        postId: post.post._id,
         comment: comment
       },
       {
@@ -42,22 +47,22 @@ const PostCard = ({ post, onDelete }) => {
     <div className="post-card">
       <div className="post-card-header">
         <span className="post-card-username">@{user.username}</span>
-        <span className="post-card-time">{new Date(post.createdAt).toLocaleString()}</span>
+        <span className="post-card-time">{new Date(post.post.createdAt).toLocaleString()}</span>
       </div>
-      <div className="post-card-content">{post.content}</div>
+      <div className="post-card-content">{post.post.content}</div>
       <div className="post-card-footer">
         <div className="post-card-stats">
           <span className="post-card-likes">
-            <FontAwesomeIcon icon={faHeart} /> {post.likes}
+            <FontAwesomeIcon icon={faHeart} /> {post.post.likes}
           </span>
           <span className="post-card-comments" onClick={handleOpen}>
-            <FontAwesomeIcon icon={faComment} /> {post.comments.length}
+            <FontAwesomeIcon icon={faComment} /> {post.post.comments.length}
           </span>
           <span className="post-card-shares">
-            <FontAwesomeIcon icon={faShare} /> {post.shares}
+            <FontAwesomeIcon icon={faShare} /> {post.post.shares}
           </span>
         </div>
-        <button className="post-card-delete-button" onClick={() => onDelete(post._id)}>
+        <button className="post-card-delete-button" /**onClick={() => onDelete(post._id)}*/>
           Delete
         </button>
       </div>
@@ -73,7 +78,7 @@ const PostCard = ({ post, onDelete }) => {
        <DialogTitle sx={{ m: 0, p: 7, minWidth: 400}} id="customized-dialog-title">
        <span className="post-card-username">@{user.username}</span>
        <br></br>
-          {post.content}
+          {post.post.content}
         </DialogTitle>
         <IconButton
           aria-label="close"
