@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { PostContext } from '../contexts/PostContext';
-import CreatePost from './CreatePost';
-import PostList from './PostList';
+import { PostContext } from '../../contexts/PostContext';
+import CreatePost from '../../components/CreatePost';
+import PostList from '../../components/PostList';
 import EditProfile from './EditProfile';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../../components/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCamera, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import {Post} from '../../types/Post'
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './Profile.css';
 
-const Profile = () => {
+
+const Profile: React.FC = () => {
   const {user,token} = useAuth();
-  console.log(user);
   
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [profilePicture, setProfilePicture] = useState(user.profilePicture || null);
 
-  const handleNewPost = (postContent) => {
+  const handleNewPost = (postContent: Post) => {
     setPosts([postContent, ...posts]);
   };
 
@@ -36,8 +36,7 @@ const Profile = () => {
       
       if (response.status === 200) {
         // Assuming the response.data.posts contains an array of posts
-        const fetchedPosts = response.data.posts.map(post => ({
-            _id: post._id, 
+        const fetchedPosts = response.data.posts.map((post: Post) => ({
             ...post
         }));
         setPosts(fetchedPosts);
@@ -70,8 +69,14 @@ useEffect(() => {
 }, [user]);
 
 
-  const handleProfilePictureChange = (e) => {
-    const file = e.target.files[0];
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+  
+    if (!files || files.length === 0) {
+      console.log('Profile picture file is empty');
+      return;
+    }
+    const file = files[0];
     const reader = new FileReader();
     reader.onloadend = () => {
       setProfilePicture(reader.result);
@@ -82,7 +87,7 @@ useEffect(() => {
     }
   };
 
-  const uploadProfilePicture = (file) => {
+  const uploadProfilePicture = (file: File) => {
     const formData = new FormData();
     formData.append('profilePicture', file);
 
@@ -124,7 +129,7 @@ useEffect(() => {
           />
           <FontAwesomeIcon icon={faCamera} className="camera-icon" />
         </div>
-        <EditProfile user={user} token = {token} />
+        <EditProfile/>
       </div>
       <div className="text-center profile-details">
         <h2 className="profile-name">{user.username}</h2>

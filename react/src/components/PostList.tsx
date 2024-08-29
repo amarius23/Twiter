@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import PostCard from './PostCard';
-import './PostList.css';
 import { PostContext } from '../contexts/PostContext';
+import { Post } from '../types/Post';
 
 const PostList = () => {
-  const posts = useContext(PostContext);
+  const posts = useContext(PostContext) as Post[];
   // const handleDelete = async (postId) => {
   //   try {
   //     const token = localStorage.getItem('token');
